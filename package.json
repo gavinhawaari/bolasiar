@@ -1,0 +1,14 @@
+{
+  "name": "bolasr",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "jsdom": "^20.0.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
