@@ -1,71 +1,80 @@
-const fs = require('fs');
-const https = require('https');
-const { JSDOM } = require('jsdom');
+const https = require('https'); // Mengimpor modul HTTPS untuk melakukan permintaan HTTPS
+const { JSDOM } = require('jsdom'); // Mengimpor modul JSDOM untuk memanipulasi dokumen HTML
 
-const url = 'https://bolasiar.cc';  // Ganti dengan URL yang sesuai
+module.exports = (req, res) => {
+    // Melakukan permintaan GET ke situs web sumber
+    https.get('https://bolasiar.cc', (response) => {
+        let html = ''; // Variabel untuk menyimpan data HTML
 
-https.get(url, (response) => {
-    let html = '';
+        // Kumpulkan data HTML ketika ada
+        response.on('data', (chunk) => {
+            html += chunk;
+        });
 
-    response.on('data', (chunk) => {
-        html += chunk;
-    });
+        // Setelah semua data diterima
+        response.on('end', () => {
+            // Membuat objek DOM dari HTML yang diterima
+            const dom = new JSDOM(html);
+            const document = dom.window.document;
 
-    response.on('end', () => {
-        const dom = new JSDOM(html);
-        const doc = dom.window.document;
+            // Menemukan semua elemen pertandingan
+            const matches = document.querySelectorAll('.listDec.zhibo.content .today.myList a');
 
-        const matches = doc.querySelectorAll('.listDec.zhibo.content .today.myList a');
-        const jsonData = [];
+            // Array untuk menyimpan data pertandingan
+            const matchData = [];
 
-        matches.forEach(match => {
-            const link = match.href;
-            const homeTeamImg = match.querySelector('.home_team img').getAttribute('data-src');
-            const homeTeamName = match.querySelector('.home_team p').textContent.trim();
-            const awayTeamImg = match.querySelector('.visit_team img').getAttribute('data-src');
-            const awayTeamName = match.querySelector('.visit_team p').textContent.trim();
-            
-            let dateElement = match.closest('.today.myList').querySelector('.date-p');
-            let date;
-            if (dateElement) {
-                date = dateElement.textContent.trim();
-            } else {
-                dateElement = match.closest('.today.myList').querySelector('.todayTitle');
-                date = dateElement ? dateElement.textContent.trim() : 'Tanggal tidak ditemukan';
-            }
+            matches.forEach(match => {
+                const fullLink = match.getAttribute('href'); // Mengambil link asli dari elemen <a>
 
-            // Mengambil kompetisi liga
-            const leagueElement = match.querySelector('.type p:nth-child(2)');
-            const league = leagueElement ? leagueElement.textContent.trim() : 'Kompetisi tidak ditemukan';
+                const homeTeamImg = match.querySelector('.home_team img').getAttribute('data-src');
+                const homeTeamName = match.querySelector('.home_team p').textContent.trim();
+                const awayTeamImg = match.querySelector('.visit_team img').getAttribute('data-src');
+                const awayTeamName = match.querySelector('.visit_team p').textContent.trim();
 
-            // Mengambil jam pertandingan
-            const timeElement = match.querySelector('.type p:nth-child(3)');
-            const time = timeElement ? timeElement.textContent.trim() : 'Jam tidak ditemukan';
+                // Mendapatkan tanggal pertandingan
+                let dateElement = match.closest('.today.myList').querySelector('.date-p');
+                let date;
+                if (dateElement) {
+                    date = dateElement.textContent.trim();
+                } else {
+                    dateElement = match.closest('.today.myList').querySelector('.todayTitle');
+                    date = dateElement ? dateElement.textContent.trim() : 'Tanggal tidak ditemukan';
+                }
 
-            jsonData.push({
-                date: date,
-                time: time,
-                league: league,
-                homeTeam: {
-                    name: homeTeamName,
-                    img: homeTeamImg
-                },
-                awayTeam: {
-                    name: awayTeamName,
-                    img: awayTeamImg
-                },
-                link: link
+                // Mendapatkan nama kompetisi
+                const leagueElement = match.querySelector('.type p:nth-child(2)');
+                const league = leagueElement ? leagueElement.textContent.trim() : 'Kompetisi tidak ditemukan';
+
+                // Mendapatkan jam pertandingan
+                const timeElement = match.querySelector('.type p:nth-child(3)');
+                const time = timeElement ? timeElement.textContent.trim() : 'Jam tidak ditemukan';
+
+                // Menentukan apakah href tidak mengandung javascript:void(0);, jika ya, maka ganti dengan fullLink
+                const hrefValue = fullLink !== 'javascript:void(0);' ? fullLink : 'Link tidak ditemukan';
+
+                // Menambahkan data pertandingan ke dalam array matchData
+                matchData.push({
+                    date: date,
+                    time: time,
+                    league: league,
+                    fullLink: fullLink,
+                    homeTeam: {
+                        img: homeTeamImg,
+                        name: homeTeamName
+                    },
+                    awayTeam: {
+                        img: awayTeamImg,
+                        name: awayTeamName
+                    },
+                    hrefValue: hrefValue
+                });
             });
-        });
 
-        fs.writeFile('matches.json', JSON.stringify(jsonData, null, 2), err => {
-            if (err) {
-                console.error('Error writing JSON file:', err);
-            } else {
-                console.log('JSON file has been saved.');
-            }
+            // Mengirimkan data pertandingan sebagai respons JSON
+            res.status(200).json(matchData);
         });
+    }).on('error', (err) => {
+        // Menangani kesalahan jika permintaan gagal
+        res.status(500).json({ error: 'Error fetching data', details: err.message });
     });
-}).on('error', (err) => {
-    console.error('Error fetching data:', err);
-});
+};
