@@ -15,21 +15,29 @@ module.exports = (req, res) => {
 
         // Setelah semua data diterima
         response.on('end', () => {
-            const dom = new JSDOM(html);
-            const document = dom.window.document;
+            // Lakukan pemrosesan HTML untuk mendapatkan atribut src dari elemen iframe
+            const iframeSrc = extractIframeSrc(html);
 
-            // Temukan elemen iframe dan ambil atribut src-nya
-            const iframeElement = document.querySelector('iframe');
-            const iframeSrc = iframeElement ? iframeElement.getAttribute('src') : null;
-
-            if (iframeSrc) {
-                res.status(200).json({ iframeSrc: iframeSrc });
-            } else {
-                res.status(404).json({ error: 'Iframe tidak ditemukan' });
-            }
+            // Kirim atribut src iframe yang lengkap sebagai respons
+            res.status(200).json({ iframeSrc: iframeSrc });
         });
     }).on('error', (error) => {
         // Tangani kesalahan jika permintaan gagal
         res.status(500).json({ error: 'Error fetching data', details: error.message });
     });
 };
+
+// Fungsi untuk mengekstrak atribut src dari elemen iframe dalam HTML
+function extractIframeSrc(html) {
+    // Lakukan pemrosesan HTML untuk menemukan elemen iframe dengan kelas 'player-holder'
+    const dom = new JSDOM(html);
+    const document = dom.window.document;
+    const iframeElement = document.querySelector('.player-container #pembed iframe.player-holder');
+    
+    // Ambil atribut src dari elemen iframe jika ditemukan
+    if (iframeElement) {
+        return iframeElement.getAttribute('src');
+    } else {
+        return 'Iframe src not found';
+    }
+}
