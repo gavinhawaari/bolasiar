@@ -2,18 +2,18 @@ const https = require('https');
 const { JSDOM } = require('jsdom');
 
 module.exports = (req, res) => {
-    const matchId = req.query.id; // Mendapatkan nilai "id" dari parameter query string
+    const fullLink = 'https://bolasiar.cc' + req.query.fullLink; // Mengambil fullLink dari query parameter dan menambahkan 'https://bolasiar.cc' di depannya
 
-    // Buat URL untuk permintaan HTTPS dengan ID pertandingan
-    const url = `https://bolasiar.cc/live/${matchId}`;
-
-    https.get(url, (response) => {
+    // Lakukan permintaan HTTP untuk mendapatkan halaman HTML
+    https.get(fullLink, (response) => {
         let html = '';
 
+        // Kumpulkan data HTML ketika ada
         response.on('data', (chunk) => {
             html += chunk;
         });
 
+        // Setelah semua data diterima
         response.on('end', () => {
             const dom = new JSDOM(html);
             const document = dom.window.document;
@@ -28,7 +28,8 @@ module.exports = (req, res) => {
                 res.status(404).json({ error: 'Iframe tidak ditemukan' });
             }
         });
-    }).on('error', (err) => {
-        res.status(500).json({ error: 'Error fetching data', details: err.message });
+    }).on('error', (error) => {
+        // Tangani kesalahan jika permintaan gagal
+        res.status(500).json({ error: 'Error fetching data', details: error.message });
     });
 };
