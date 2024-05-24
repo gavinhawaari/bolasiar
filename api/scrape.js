@@ -1,12 +1,17 @@
 const fs = require('fs');
-const fetch = require('node-fetch');
+const https = require('https');
 const { JSDOM } = require('jsdom');
 
 const url = 'https://bolasiar.cc';  // Ganti dengan URL yang sesuai
 
-fetch(url)
-    .then(response => response.text())
-    .then(html => {
+https.get(url, (response) => {
+    let html = '';
+
+    response.on('data', (chunk) => {
+        html += chunk;
+    });
+
+    response.on('end', () => {
         const dom = new JSDOM(html);
         const doc = dom.window.document;
 
@@ -60,5 +65,7 @@ fetch(url)
                 console.log('JSON file has been saved.');
             }
         });
-    })
-    .catch(err => console.error('Error fetching data:', err));
+    });
+}).on('error', (err) => {
+    console.error('Error fetching data:', err);
+});
