@@ -1,30 +1,47 @@
-const https = require('https');
-const { JSDOM } = require('jsdom');
+const https = require('https'); // Mengimpor modul HTTPS untuk melakukan permintaan HTTPS
+const { JSDOM } = require('jsdom'); // Mengimpor modul JSDOM untuk memanipulasi dokumen HTML
 
 module.exports = (req, res) => {
+    // Melakukan permintaan GET ke situs web sumber
     https.get('https://bolasiar.cc', (response) => {
-        let html = '';
+        let html = ''; // Variabel untuk menyimpan data HTML
 
+        // Kumpulkan data HTML ketika ada
         response.on('data', (chunk) => {
             html += chunk;
         });
 
+        // Setelah semua data diterima
         response.on('end', () => {
+            // Membuat objek DOM dari HTML yang diterima
             const dom = new JSDOM(html);
             const document = dom.window.document;
 
+            // Menemukan semua elemen pertandingan
             const matches = document.querySelectorAll('.listDec.zhibo.content .today.myList a');
+
+            // Array untuk menyimpan data pertandingan
             const matchData = [];
 
             matches.forEach(match => {
-                const matchId = match.getAttribute('id'); // Mendapatkan ID pertandingan dari atribut ID pada elemen
-                const fullLink = `/api/detail?id=${matchId}`; // Membuat URL ke endpoint detail.js dengan ID pertandingan
+                const fullLink = match.getAttribute('href'); // Mengambil link asli dari elemen <a>
+
+                let paramOnly = null; // Inisialisasi paramOnly dengan null
+
+                // Memeriksa apakah fullLink tidak null sebelum mencoba mendapatkan parameternya
+                if (fullLink) {
+                    const startIndex = fullLink.indexOf('/live/');
+                    if (startIndex !== -1) {
+                        paramOnly = fullLink.substring(startIndex); // Mengambil bagian setelah '/live/'
+                    }
+                }
 
                 const homeTeamImg = match.querySelector('.home_team img').getAttribute('data-src');
                 const homeTeamName = match.querySelector('.home_team p').textContent.trim();
                 const awayTeamImg = match.querySelector('.visit_team img').getAttribute('data-src');
                 const awayTeamName = match.querySelector('.visit_team p').textContent.trim();
 
+                // Mendapatkan tanggal pertandingan
                 let dateElement = match.closest('.today.myList').querySelector('.date-p');
                 let date;
                 if (dateElement) {
@@ -34,17 +51,20 @@ module.exports = (req, res) => {
                     date = dateElement ? dateElement.textContent.trim() : 'Tanggal tidak ditemukan';
                 }
 
+                // Mendapatkan nama kompetisi
                 const leagueElement = match.querySelector('.type p:nth-child(2)');
                 const league = leagueElement ? leagueElement.textContent.trim() : 'Kompetisi tidak ditemukan';
 
+                // Mendapatkan jam pertandingan
                 const timeElement = match.querySelector('.type p:nth-child(3)');
                 const time = timeElement ? timeElement.textContent.trim() : 'Jam tidak ditemukan';
 
+                // Menambahkan data pertandingan ke dalam array matchData
                 matchData.push({
                     date: date,
                     time: time,
                     league: league,
-                    fullLink: fullLink,
+                    fullLink: paramOnly, // Menggunakan parameter saja
                     homeTeam: {
                         img: homeTeamImg,
                         name: homeTeamName
@@ -52,13 +72,16 @@ module.exports = (req, res) => {
                     awayTeam: {
                         img: awayTeamImg,
                         name: awayTeamName
-                    }
+                    },
+                    hrefValue: fullLink // Menyimpan nilai asli href
                 });
             });
 
+            // Mengirimkan data pertandingan sebagai respons JSON
             res.status(200).json(matchData);
         });
     }).on('error', (err) => {
+        // Menangani kesalahan jika permintaan gagal
         res.status(500).json({ error: 'Error fetching data', details: err.message });
     });
 };
