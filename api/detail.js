@@ -2,7 +2,7 @@ const https = require('https');
 const { JSDOM } = require('jsdom');
 
 module.exports = (req, res) => {
-    const fullLink = 'https://bolasiar.cc' + req.query.fullLink; // Mengambil fullLink dari query parameter dan menambahkan 'https://bolasiar.cc' di depannya
+    const fullLink = 'https://bolasiar.cc/' + req.query.fullLink; // Mengambil fullLink dari query parameter dan menambahkan 'https://bolasiar.cc' di depannya
 
     // Lakukan permintaan HTTP untuk mendapatkan halaman HTML
     https.get(fullLink, (response) => {
