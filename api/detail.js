@@ -5,7 +5,7 @@ module.exports = (req, res) => {
     const matchId = req.query.id; // Mendapatkan nilai "id" dari parameter query string
 
     // Buat URL untuk permintaan HTTPS dengan ID pertandingan
-    const url = `https://bolasiar.cc/${matchId}`;
+    const url = `https://bolasiar.cc/live/${matchId}`;
 
     https.get(url, (response) => {
         let html = '';
