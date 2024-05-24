@@ -17,7 +17,8 @@ module.exports = (req, res) => {
             const matchData = [];
 
             matches.forEach(match => {
-                const fullLink = match.getAttribute('href');
+                const matchId = match.getAttribute('id'); // Mendapatkan ID pertandingan dari atribut ID pada elemen
+                const fullLink = `/api/detail?id=${matchId}`; // Membuat URL ke endpoint detail.js dengan ID pertandingan
 
                 const homeTeamImg = match.querySelector('.home_team img').getAttribute('data-src');
                 const homeTeamName = match.querySelector('.home_team p').textContent.trim();
@@ -39,16 +40,11 @@ module.exports = (req, res) => {
                 const timeElement = match.querySelector('.type p:nth-child(3)');
                 const time = timeElement ? timeElement.textContent.trim() : 'Jam tidak ditemukan';
 
-                // Mengambil bagian path dari URL sebagai fullLink
-                const fullLinkPath = new URL(fullLink).pathname;
-
-                const hrefValue = fullLink !== 'javascript:void(0);' ? fullLink : 'Link tidak ditemukan';
-
                 matchData.push({
                     date: date,
                     time: time,
                     league: league,
-                    fullLink: fullLinkPath,
+                    fullLink: fullLink,
                     homeTeam: {
                         img: homeTeamImg,
                         name: homeTeamName
@@ -56,8 +52,7 @@ module.exports = (req, res) => {
                     awayTeam: {
                         img: awayTeamImg,
                         name: awayTeamName
-                    },
-                    hrefValue: hrefValue
+                    }
                 });
             });
 
