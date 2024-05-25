@@ -1,14 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/scrape.js", "use": "@vercel/node" },
-    { "src": "public/index.html", "use": "@vercel/static" }
+    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "public/**/*.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/api/scrape", "dest": "/api/scrape.js" },
-    { "src": "/api/details", "dest": "/api/details.js" },
-    { "src": "/api/detail", "dest": "/api/detail.js" },
-    { "src": "/api/gs", "dest": "/api/gs.js" },
+    { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/", "dest": "/public/index.html" }
   ]
 }
