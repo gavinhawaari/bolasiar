@@ -73,7 +73,7 @@ module.exports = (req, res) => {
                         img: awayTeamImg,
                         name: awayTeamName
                     },
-                    hrefValue: fullLink // Menyimpan nilai asli href
+                    url: fullLink 
                 });
             });
 
