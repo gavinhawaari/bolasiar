@@ -2,6 +2,17 @@ const https = require('https'); // Mengimpor modul HTTPS untuk melakukan permint
 const { JSDOM } = require('jsdom'); // Mengimpor modul JSDOM untuk memanipulasi dokumen HTML
 
 module.exports = (req, res) => {
+    // Menambahkan header CORS ke dalam respons
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Mengatasi preflight request (OPTIONS)
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     // Melakukan permintaan GET ke situs web sumber
     https.get('https://bolasiar.cc', (response) => {
         let html = ''; // Variabel untuk menyimpan data HTML
