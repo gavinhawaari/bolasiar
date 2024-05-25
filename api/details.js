@@ -11,7 +11,12 @@ module.exports = (req, res) => {
         return;
     }
 
-    const id = req.query.id; // Mengambil nilai parameter id dari permintaan
+    const id = req.query.id || req.query; // Mengambil nilai parameter id dari permintaan
+
+    if (!id) {
+        res.status(400).json({ error: 'Parameter id tidak ditemukan' });
+        return;
+    }
 
     https.get('https://bolasiar.cc/' + id, (response) => {
         let html = '';
@@ -24,15 +29,12 @@ module.exports = (req, res) => {
             const dom = new JSDOM(html);
             const document = dom.window.document;
 
-            // Mendapatkan elemen iframe pertama dari dokumen
             const iframe = document.querySelector('iframe');
 
             if (iframe) {
-                // Mendapatkan nilai src dari iframe
                 const src = iframe.getAttribute('src');
 
                 if (src) {
-                    // Mengirimkan URL yang telah dibentuk kembali ke klien dalam format JSON
                     res.status(200).json({ url: src });
                 } else {
                     res.status(500).json({ error: 'Tidak dapat menemukan src dalam iframe' });
