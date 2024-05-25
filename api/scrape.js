@@ -30,9 +30,9 @@ module.exports = (req, res) => {
 
                 // Memeriksa apakah fullLink tidak null sebelum mencoba mendapatkan parameternya
                 if (fullLink) {
-                    const startIndex = fullLink.indexOf('/live/');
+                    const startIndex = fullLink.lastIndexOf('-') + 1;
                     if (startIndex !== -1) {
-                        paramOnly = fullLink.substring(startIndex); // Mengambil bagian setelah '/live/'
+                        paramOnly = fullLink.substring(startIndex); // Mengambil bagian setelah tanda strip terakhir
                     }
                 }
 
@@ -64,7 +64,7 @@ module.exports = (req, res) => {
                     date: date,
                     time: time,
                     league: league,
-                    fullLink: paramOnly, // Menggunakan parameter saja
+                    fullLink: "https://bolasiar.htmlplayer.xyz/?server=beta&param=" + paramOnly, // Menggunakan URL yang diinginkan
                     homeTeam: {
                         img: homeTeamImg,
                         name: homeTeamName
