@@ -22,6 +22,10 @@
       "use":"@vercel/node"
       },
       {
+      "src":"api/targeturl.js",
+      "use":"@vercel/node"
+      },
+      {
          "src":"public/index.html",
          "use":"@vercel/static"
       }
@@ -46,6 +50,10 @@
       {
          "src":"/api/gs",
          "dest":"/api/gs.js"
+      },
+      {
+         "src":"/api/targeturl",
+         "dest":"/api/targeturl.js"
       },
       {
          "src":"/",
