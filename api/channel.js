@@ -34,8 +34,12 @@ module.exports = (req, res) => {
             options.forEach((option, index) => {
                 // Mendekode nilai option menggunakan base64
                 const decodedValue = Buffer.from(option.value, 'base64').toString('utf-8');
+                
+                // Mengambil nilai dari atribut src dalam elemen iframe
+                const srcValue = decodedValue.match(/src="([^"]+)"/)[1];
+                
                 servers.push({
-                    [`server${index + 1}`]: decodedValue
+                    [`server${index + 1}`]: srcValue
                 });
             });
 
