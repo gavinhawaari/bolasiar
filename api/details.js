@@ -1,5 +1,6 @@
 const https = require('https');
 const { JSDOM } = require('jsdom');
+const targetUrl = require('./targeturl');
 
 module.exports = (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -18,7 +19,7 @@ module.exports = (req, res) => {
         return;
     }
 
-    https.get('https://bolasiar.cc/' + id, (response) => {
+    https.get(targetUrl + id, (response) => {
         let html = '';
 
         response.on('data', (chunk) => {
