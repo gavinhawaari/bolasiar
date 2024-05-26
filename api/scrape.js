@@ -1,5 +1,7 @@
 const https = require('https'); // Mengimpor modul HTTPS untuk melakukan permintaan HTTPS
 const { JSDOM } = require('jsdom'); // Mengimpor modul JSDOM untuk memanipulasi dokumen HTML
+const targetUrl = require('./targeturl');
+
 
 module.exports = (req, res) => {
     // Menambahkan header CORS ke dalam respons
@@ -14,7 +16,7 @@ module.exports = (req, res) => {
     }
 
     // Melakukan permintaan GET ke situs web sumber
-    https.get('https://bolasiar.cc', (response) => {
+    https.get(targetUrl, (response) => {
         let html = ''; // Variabel untuk menyimpan data HTML
 
         // Kumpulkan data HTML ketika ada
