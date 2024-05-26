@@ -14,14 +14,6 @@
       "use":"@vercel/node"
       },
       {
-      "src":"api/detail.js",
-      "use":"@vercel/node"
-      },
-      {
-      "src":"api/gs.js",
-      "use":"@vercel/node"
-      },
-      {
       "src":"api/targeturl.js",
       "use":"@vercel/node"
       },
@@ -42,14 +34,6 @@
       {
          "src":"/api/details",
          "dest":"/api/details.js"
-      },
-      {
-         "src":"/api/detail",
-         "dest":"/api/detail.js"
-      },
-      {
-         "src":"/api/gs",
-         "dest":"/api/gs.js"
       },
       {
          "src":"/api/targeturl",
