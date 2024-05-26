@@ -11,10 +11,14 @@ module.exports = (req, res) => {
         return;
     }
 
-    // URL halaman target
-    const url = 'https://bolasiar.cc/live/deportivo-maldonado-vs-centro-atletico-fenix-bigmatch-x4ZJL4H';
-
-    https.get(url, (response) => {
+    const id = req.query.id || req.query; // Mengambil nilai parameter id dari permintaan
+    
+    if (!id) {
+    res.status(400).json({ error: 'Parameter id tidak ditemukan' });
+    return;
+    }
+    
+    https.get('https://bolasiar.cc/' + id, (response) => {
         let data = '';
 
         // Menerima data dari stream
