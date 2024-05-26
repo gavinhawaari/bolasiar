@@ -32,8 +32,8 @@ module.exports = (req, res) => {
             const options = document.querySelectorAll('option.mirroroption');
             let servers = [];
             options.forEach((option, index) => {
-                // Mendekode nilai option sebelum menambahkannya ke array
-                const decodedValue = decodeURIComponent(option.value);
+                // Mendekode nilai option menggunakan base64
+                const decodedValue = Buffer.from(option.value, 'base64').toString('utf-8');
                 servers.push({
                     [`server${index + 1}`]: decodedValue
                 });
