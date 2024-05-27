@@ -18,7 +18,7 @@
       "use":"@vercel/node"
       },
       {
-         "src":"public/index.html",
+         "src":"public/**",
          "use":"@vercel/static"
       }
    ],
@@ -40,8 +40,8 @@
          "dest":"/api/targeturl.js"
       },
       {
-         "src":"/",
-         "dest":"/public/index.html"
+         "src":"/(.*)",
+         "dest":"/public/$1"
       }
    ]
 }
