@@ -13,38 +13,57 @@ module.exports = (req, res) => {
     }
 
     const id = req.query.id || req.query; // Mengambil nilai parameter id dari permintaan
-
+    
     if (!id) {
-        res.status(400).json({ error: 'Parameter id tidak ditemukan' });
-        return;
+    res.status(400).json({ error: 'Parameter id tidak ditemukan' });
+    return;
     }
-
+    
     https.get(targetUrl + id, (response) => {
-        let html = '';
+        let data = '';
 
+        // Menerima data dari stream
         response.on('data', (chunk) => {
-            html += chunk;
+            data += chunk;
         });
 
+        // Setelah data diterima sepenuhnya
         response.on('end', () => {
-            const dom = new JSDOM(html);
+            // Mem-parse HTML menggunakan JSDOM
+            const dom = new JSDOM(data);
             const document = dom.window.document;
 
-            const iframe = document.querySelector('iframe');
+            // Mengambil nilai dari elemen dengan class "mirroroption"
+            const options = document.querySelectorAll('option.mirroroption');
+            let servers = [];
+            options.forEach((option, index) => {
+                // Mendekode nilai option menggunakan base64
+                const decodedValue = Buffer.from(option.value, 'base64').toString('utf-8');
+                
+                // Mengambil nilai dari atribut src dalam elemen iframe
+                const srcValue = decodedValue.match(/src="([^"]+)"/)[1];
+                
+                // Mengambil nilai dari atribut src dalam url https://bolasiar.htmlplayer.xyz/?type=HLS&src=
+                const urlValue = srcValue.match(/src="([^"]+)"/)[1];
 
-            if (iframe) {
-                const src = iframe.getAttribute('src');
+                // Mendekode nilai src menggunakan base64
+                const decodedurlValue = Buffer.from(urlValue.value, 'base64').toString('utf-8');
+                
+                
+                servers.push({
+                    [`server${index + 1}`]: decodedurlValue
+                });
+            });
 
-                if (src) {
-                    res.status(200).json({ url: src });
-                } else {
-                    res.status(500).json({ error: 'Tidak dapat menemukan src dalam iframe' });
-                }
-            } else {
-                res.status(500).json({ error: 'Tidak dapat menemukan iframe dalam dokumen' });
-            }
+            // Mengkonversi nilai menjadi format JSON
+            const jsonData = JSON.stringify(servers, null, 2);
+
+            // Menampilkan data JSON di response
+            res.setHeader('Content-Type', 'application/json');
+            res.status(200).end(jsonData);
         });
-    }).on('error', (error) => {
-        res.status(500).json({ error: error.message });
+    }).on('error', (e) => {
+        console.error('Error:', e);
+        res.status(500).end('Gagal mengambil data.');
     });
 };
