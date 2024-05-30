@@ -24,6 +24,8 @@ module.exports = async (req, res) => {
         // Mengambil bagian detail dari respons
         const detailLiga = data.details;
 
+          // Menghapus bagian itemListElement
+        delete detailLiga.breadcrumbJSONLD.itemListElement;
         // Menghapus kunci tabs dan allAvailableSeasons jika ada
         delete detailLiga.tabs;
         delete detailLiga.allAvailableSeasons;
