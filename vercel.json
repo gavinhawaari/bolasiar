@@ -6,6 +6,10 @@
          "use":"@vercel/node"
       },
       {
+         "src":"api/news.js",
+         "use":"@vercel/node"
+      },
+      {
          "src":"api/channel.js",
          "use":"@vercel/node"
       },
@@ -26,6 +30,10 @@
       {
          "src":"/api/scrape",
          "dest":"/api/scrape.js"
+      },
+      {
+         "src":"/api/news",
+         "dest":"/api/news.js"
       },
       {
          "src":"/api/channel",
