@@ -31,7 +31,10 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const url = 'https://www.fotmob.com/api/tlnews?id=47&type=league&language=id&startIndex=1';
+    // Mengambil nilai parameter id dari permintaan
+    const id = req.query.id || '47'; // Gunakan '47' sebagai default jika id tidak ada
+
+    const url = `https://www.fotmob.com/api/tlnews?id=${id}&type=league&language=id&startIndex=1`;
 
     try {
         const response = await fetch(url);
