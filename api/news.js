@@ -1,10 +1,5 @@
 const fetch = require('node-fetch');
 const timeago = require('timeago.js');
-const cors = require('cors');
-const express = require('express');
-
-const app = express();
-app.use(cors());
 
 // Register Indonesian locale for timeago
 timeago.register('id', (number, index, total_sec) => [
@@ -24,7 +19,18 @@ timeago.register('id', (number, index, total_sec) => [
     ['%s tahun yang lalu', 'dalam %s tahun']
 ][index]);
 
-app.get('/news', async (req, res) => {
+module.exports = async (req, res) => {
+    // Menambahkan header CORS ke dalam respons
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+    // Mengatasi preflight request (OPTIONS)
+    if (req.method === 'OPTIONS') {
+        res.status(200).end();
+        return;
+    }
+
     const url = 'https://www.fotmob.com/api/tlnews?id=47&type=league&language=id&startIndex=1';
 
     try {
@@ -47,6 +53,4 @@ app.get('/news', async (req, res) => {
         console.error('Error fetching news:', error);
         res.status(500).json({ error: 'Error fetching news' });
     }
-});
-
-module.exports = app;
+};
