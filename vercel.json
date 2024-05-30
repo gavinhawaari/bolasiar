@@ -2,24 +2,8 @@
    "version":2,
    "builds":[
       {
-         "src":"api/scrape.js",
+         "src":"api/**",
          "use":"@vercel/node"
-      },
-      {
-         "src":"api/news.js",
-         "use":"@vercel/node"
-      },
-      {
-         "src":"api/channel.js",
-         "use":"@vercel/node"
-      },
-      {
-      "src":"api/details.js",
-      "use":"@vercel/node"
-      },
-      {
-      "src":"api/targeturl.js",
-      "use":"@vercel/node"
       },
       {
          "src":"public/**",
@@ -28,24 +12,8 @@
    ],
    "routes":[
       {
-         "src":"/api/scrape",
-         "dest":"/api/scrape.js"
-      },
-      {
-         "src":"/api/news",
-         "dest":"/api/news.js"
-      },
-      {
-         "src":"/api/channel",
-         "dest":"/api/channel.js"
-      },
-      {
-         "src":"/api/details",
-         "dest":"/api/details.js"
-      },
-      {
-         "src":"/api/targeturl",
-         "dest":"/api/targeturl.js"
+         "src":"/api/(.*)",
+         "dest":"/api/$1.js"
       },
       {
          "src":"/(.*)",
