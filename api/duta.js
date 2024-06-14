@@ -15,16 +15,13 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const search = req.query.search || '';
-    // Memeriksa apakah parameter code telah diberikan
-    if (!search) {
-        res.status(400).json({ error: 'Parameter search=indonesia atau negara tidak ditemukan' });
-        return;
-    }
 
-    const urls = 'https://artist.dutamovie21.cloud/';
-    let url = `${urls}?s=/${search}&search=advanced&post_type=&index=&orderby=&genre=&movieyear=&country=indonesia&quality=`;
-  
+    const pages = req.query.pages !== undefined ? req.query.pages : 1;
+    
+    let url = `https://njav.tv/en/missav?sort=recent_update`;
+    if (pages !== 1) {
+        url += `&page=${pages}/`;
+    }
 
     https.get(url, (response) => {
         let data = '';
@@ -39,28 +36,21 @@ module.exports = async (req, res) => {
             const dom = new JSDOM(data);
             const document = dom.window.document;
 
-            const articles = document.querySelectorAll('article');
+            const articles = document.querySelectorAll('div.box-item');
             let results = [];
 
             articles.forEach(article => {
                 const poster = article.querySelector('img') ? article.querySelector('img').getAttribute('src') : 'N/A';
-                const title = article.querySelector('h2') ? article.querySelector('h2').textContent.trim() : 'N/A';
-                let slug = article.querySelector('h2 a') ? article.querySelector('h2 a').getAttribute('href') : 'N/A';
-
-                // Menetapkan nilai type berdasarkan nilai slug
-                const type = slug.includes('/tv/') ? 'tv' : 'movie';
+                const title = article.querySelector('div.detail a') ? article.querySelector('div.detail a').textContent.trim() : 'N/A';
+                let slug = article.querySelector('div.detail a') ? article.querySelector('div.detail a').getAttribute('href') : 'N/A';
                 
-                // Menghapus bagian "https" dan domain dari slug menggunakan regex
-                slug = slug.replace(/^https?:\/\/[^/]+/, '');
 
-                // Menghapus simbol slash ('/') pertama dan terakhir dari slug
-                slug = slug.replace(/^\/|\/$/g, '');
                 
                 results.push({
                     poster,
                     title,
-                    slug,
-                    type
+                    slug
+                    
                 });
             });
 
