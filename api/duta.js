@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
 
     const pages = req.query.pages !== undefined ? req.query.pages : 1;
     
-    let url = `https://njav.tv/en/missav?sort=recent_update`;
+    let url = 'https://njav.tv/en/missav?sort=recent_update';
     if (pages !== 1) {
         url += `&page=${pages}/`;
     }
