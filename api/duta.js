@@ -20,7 +20,7 @@ module.exports = async (req, res) => {
 
     const pages = req.query.pages !== undefined ? req.query.pages : 1;
     
-    let url = `${urls}?sort=recent_update/`;
+    let url = `${urls}?sort=recent_update`;
     if (pages !== 1) {
         url += `&page=${pages}/`;
     }
@@ -51,8 +51,7 @@ module.exports = async (req, res) => {
                 results.push({
                     poster,
                     title,
-                    slug
-                    
+                    slug    
                 });
             });
 
