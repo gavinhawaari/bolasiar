@@ -15,10 +15,12 @@ module.exports = async (req, res) => {
         return;
     }
 
+    const urls = 'https://njav.tv/en/missav';
+
 
     const pages = req.query.pages !== undefined ? req.query.pages : 1;
     
-    let url = 'https://njav.tv/en/missav?sort=recent_update';
+    let url = `${urls}?sort=recent_update/`;
     if (pages !== 1) {
         url += `&page=${pages}/`;
     }
