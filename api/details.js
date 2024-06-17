@@ -1,79 +1,62 @@
 const https = require('https');
-const { JSDOM } = require('jsdom');
-const targetUrl = require('./targeturl'); // Pastikan targetUrl diekspor dengan benar
+const jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const targetUrl = require('./targeturl');
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
+    // Menambahkan header CORS ke dalam respons
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+    // Mengatasi preflight request (OPTIONS)
     if (req.method === 'OPTIONS') {
         res.status(200).end();
         return;
     }
 
-    const id = req.query.id; // Pastikan id diambil dari parameter query
+    const page = req.query.page !== undefined ? req.query.page : 1;
     
-    if (!id) {
-        res.status(400).json({ error: 'Parameter id tidak ditemukan' });
-        return;
+    let url = `${targetUrl}id/actor/`;
+    
+    if (page !== 1) {
+        url += `?page=${page}`;
     }
-    
-    https.get(`${targetUrl}${id}`, (response) => {
+
+    https.get(url, (response) => {
         let data = '';
 
-        // Menerima data dari stream
+        // Mengumpulkan data yang diterima
         response.on('data', (chunk) => {
             data += chunk;
         });
 
-        // Setelah data diterima sepenuhnya
+        // Proses data setelah selesai diterima
         response.on('end', () => {
-            try {
-                // Mem-parse HTML menggunakan JSDOM
-                const dom = new JSDOM(data);
-                const document = dom.window.document;
+            const dom = new JSDOM(data);
+            const document = dom.window.document;
 
-                // Mengambil nilai dari elemen dengan class "mirroroption"
-                const options = document.querySelectorAll('option.mirroroption');
-                let servers = [];
+            const articles = document.querySelectorAll('div[class="col-6 col-md-4 col-lg-3 bl-item"]');
+            let results = [];
+
+            articles.forEach(article => {
+                const thumbnail = article.querySelector('img') ? article.querySelector('img').getAttribute('src') : 'N/A';
+                const name = article.querySelector('a') ? article.querySelector('a').textContent.trim() : 'N/A';
+                const slug = article.querySelector('a') ? article.querySelector('a').getAttribute('href') : 'N/A';
                 
-                options.forEach((option, index) => {
-                    // Mendekode nilai option menggunakan base64
-                    const decodedValue = Buffer.from(option.value, 'base64').toString('utf-8');
-                    
-                    // Mengambil nilai dari atribut src dalam elemen iframe
-                    const iframeMatch = decodedValue.match(/src="([^"]+)"/);
-                    if (iframeMatch) {
-                        const iframeSrc = iframeMatch[1];
 
-                        // Mendekode nilai src dalam URL https://bolasiar.htmlplayer.xyz/?type=HLS&src=
-                        const urlMatch = iframeSrc.match(/src=([^&]+)/);
-                        if (urlMatch) {
-                            const encodedSrc = urlMatch[1];
-                            const decodedSrc = Buffer.from(encodedSrc, 'base64').toString('utf-8');
-                            
-                            // Menambahkan server ke array
-                            servers.push({
-                                [`server${index + 1}`]: decodedSrc
-                            });
-                        }
-                    }
+                
+                results.push({
+                    poster,
+                    name,
+                    slug    
                 });
+            });
 
-                // Mengkonversi nilai menjadi format JSON
-                const jsonData = JSON.stringify(servers, null, 2);
-
-                // Menampilkan data JSON di response
-                res.setHeader('Content-Type', 'application/json');
-                res.status(200).end(jsonData);
-            } catch (error) {
-                console.error('Parsing error:', error);
-                res.status(500).json({ error: 'Gagal mem-parse data HTML.' });
-            }
+            res.status(200).json(results);
         });
-    }).on('error', (e) => {
-        console.error('Error:', e);
-        res.status(500).json({ error: 'Gagal mengambil data.' });
+
+    }).on('error', (err) => {
+        res.status(500).json({ error: err.message });
     });
 };
