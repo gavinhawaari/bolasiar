@@ -16,7 +16,7 @@ module.exports = async (req, res) => {
     }
 
     // Mengambil nilai parameter slugs dari permintaan
-    const id = req.query.id || '';
+    const id = req.query.id || 'new-release';
 
     // Memeriksa apakah parameter slugs telah diberikan
     if (!id) {
