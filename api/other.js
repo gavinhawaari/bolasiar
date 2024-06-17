@@ -24,10 +24,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const urls = 'https://www.njav.com/';
     const page = req.query.page !== undefined ? req.query.page : 1;
     
-    let url = `${urls}id/${id}/`;
+    let url = `${targetUrl}id/${id}/`;
     
     if (page !== 1) {
         url += `?page=${page}`;
