@@ -40,14 +40,14 @@ module.exports = async (req, res) => {
             let results = [];
 
             articles.forEach(article => {
-                const thumbnail = article.querySelector('img') ? article.querySelector('img').getAttribute('src') : 'N/A';
+                const thumb = article.querySelector('img') ? article.querySelector('img').getAttribute('src') : 'N/A';
                 const name = article.querySelector('a') ? article.querySelector('a').textContent.trim() : 'N/A';
                 const slug = article.querySelector('a') ? article.querySelector('a').getAttribute('href') : 'N/A';
                 
 
                 
                 results.push({
-                    poster,
+                    thumb,
                     name,
                     slug    
                 });
