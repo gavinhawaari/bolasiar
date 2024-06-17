@@ -15,7 +15,7 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const urls = 'https://www.njav.com/id/';
+    const urls = `${targetUrl}id/`;
     
     https.get(urls, (response) => {
         let data = '';
