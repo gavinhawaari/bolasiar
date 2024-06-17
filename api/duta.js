@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
             let results = [];
 
             articles.forEach(article => {
-                const poster = article.querySelector('img') ? article.querySelector('img').getAttribute('src') : 'N/A';
+                const poster = article.querySelector('img') ? article.querySelector('img').getAttribute('data-src') : 'N/A';
                 const title = article.querySelector('div.detail a') ? article.querySelector('div.detail a').textContent.trim() : 'N/A';
                 const slug = article.querySelector('div.detail a') ? article.querySelector('div.detail a').getAttribute('href') : 'N/A';
                 
