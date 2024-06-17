@@ -15,14 +15,22 @@ module.exports = async (req, res) => {
         return;
     }
 
+    // Mengambil nilai parameter slugs dari permintaan
+    const id = req.query.id || '';
+
+    // Memeriksa apakah parameter slugs telah diberikan
+    if (!id) {
+        res.status(400).json({ error: 'Parameter new-release atau recent-update tidak ditemukan' });
+        return;
+    }
+
     const urls = 'https://www.njav.com/';
-
-
-    const pages = req.query.pages !== undefined ? req.query.pages : 1;
+    const page = req.query.page !== undefined ? req.query.page : 1;
     
-    let url = `${urls}id/new-release/`;
-    if (pages !== 1) {
-        url += `?page=${pages}`;
+    let url = `${urls}id/${id}/`;
+    
+    if (page !== 1) {
+        url += `?page=${page}`;
     }
 
     https.get(url, (response) => {
