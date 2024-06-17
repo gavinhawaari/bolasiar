@@ -1,4 +1,4 @@
 // api/serverurl.js
 
-const targetUrl = 'https://bolasiar.cc/';
+const targetUrl = 'https://www.njav.com/';
 module.exports = targetUrl;
