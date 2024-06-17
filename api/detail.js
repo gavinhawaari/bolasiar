@@ -16,15 +16,15 @@ module.exports = async (req, res) => {
     }
 
     // Mengambil nilai parameter slugs dari permintaan
-    const slugs = req.query.slugs || '';
+    const slug = req.query.slug || '';
 
     // Memeriksa apakah parameter slugs telah diberikan
-    if (!slugs) {
-        res.status(400).json({ error: 'Parameter slug movies tidak ditemukan' });
+    if (!slug) {
+        res.status(400).json({ error: 'Parameter slug detail tidak ditemukan' });
         return;
     }
 
-    let url = `https://www.njav.com/id/${slugs}`;
+    let url = `${targetUrl}id/${slug}`;
 
     https.get(url, (response) => {
         let data = '';
