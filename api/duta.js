@@ -15,14 +15,14 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const urls = 'https://njav.tv/en/missav';
+    const urls = 'https://www.njav.com/';
 
 
     const pages = req.query.pages !== undefined ? req.query.pages : 1;
     
-    let url = `${urls}?sort=recent_update`;
+    let url = `${urls}id/new-release/`;
     if (pages !== 1) {
-        url += `&page=${pages}/`;
+        url += `?page=${pages}`;
     }
 
     https.get(url, (response) => {
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
             const dom = new JSDOM(data);
             const document = dom.window.document;
 
-            const articles = document.querySelectorAll('div.box-item');
+            const articles = document.querySelectorAll('div[class="col-6 col-sm-4 col-lg-3"]');
             let results = [];
 
             articles.forEach(article => {
