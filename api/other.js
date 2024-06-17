@@ -44,6 +44,7 @@ module.exports = async (req, res) => {
             articles.forEach(article => {
                 const poster = article.querySelector('img') ? article.querySelector('img').getAttribute('data-src') : 'N/A';
                 const title = article.querySelector('div.detail a') ? article.querySelector('div.detail a').textContent.trim() : 'N/A';
+                const durasi = article.querySelector('div.duration') ? article.querySelector('div.duration').textContent.trim() : 'N/A';
                 const slug = article.querySelector('div.detail a') ? article.querySelector('div.detail a').getAttribute('href') : 'N/A';
                 
 
@@ -51,6 +52,7 @@ module.exports = async (req, res) => {
                 results.push({
                     poster,
                     title,
+                    durasi,
                     slug    
                 });
             });
