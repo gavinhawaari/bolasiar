@@ -53,11 +53,15 @@ module.exports = async (req, res) => {
                 const title = article.querySelector('div.detail a') ? article.querySelector('div.detail a').textContent.trim() : 'N/A';
                 const durasi = article.querySelector('div.duration') ? article.querySelector('div.duration').textContent.trim() : 'N/A';
                 const slug = article.querySelector('div.detail a') ? article.querySelector('div.detail a').getAttribute('href') : 'N/A';
-                
+                const previ = article.querySelector('div.thumb') ? article.querySelector('div.thumb').getAttribute('v-scope') : 'N/A';
+                // Hilangkan bagian 'https://static.vip/resize/' dan '/thumb_h.webp'
+                const preview = previ.replace("Preview('", "").replace("')", "");
+
 
                 
                 results.push({
                     poster,
+                    preview,
                     title,
                     durasi,
                     slug    
