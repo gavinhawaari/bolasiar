@@ -70,6 +70,19 @@ module.exports = async (req, res) => {
                 }
             });
 
+            // tags
+
+            let tagsList = [];
+
+            detailMovieElements.forEach(element => {
+                const href = element.getAttribute('href');
+
+                if (href.includes('tags/')) {
+                    const text = element.textContent.trim();
+                    tagsList.push({ name: text, url: href });
+                }
+            });
+
             // Mengambil Poster
             const posteroneElement = document.querySelector('div[id="player"]');
             const posterone = posteroneElement ? posteroneElement.getAttribute('data-poster') : 'N/A';
@@ -96,6 +109,7 @@ module.exports = async (req, res) => {
                 alurcerita,
                 aktor: aktorList,
                 genre: genreList,
+                tags: tagsList,
                 player
             };
 
