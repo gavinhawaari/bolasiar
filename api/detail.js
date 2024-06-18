@@ -57,9 +57,16 @@ module.exports = async (req, res) => {
                 }
             });
 
+            // Mengambil Poster
+            const posteroneElement = document.querySelector('div[id="player"]');
+            const posterone = posteroneElement ? posteroneElement.getAttribute('data-poster') : 'N/A';
+
+            // Hilangkan bagian 'https://static.vip/resize/' dan '/thumb_h.webp'
+            const idPly = posterone.replace('https://static.javcdn.vip/resize/', '').replace('/thumb_h.webp', '');
+
             // Mengambil URL dari elemen div[id="player"]
             const iframeElement = document.querySelector('div[id="player"]');
-            const player = iframeElement ? `https://www.njav.com/vv/nsfs-107?poster=${iframeElement.getAttribute('data-poster')}` : 'N/A';
+            const player = iframeElement ? `https://www.njav.com/vv/${idPly}?poster=${iframeElement.getAttribute('data-poster')}` : 'N/A';
 
             // Mengambil Poster
             const posterElement = document.querySelector('div[id="player"]');
