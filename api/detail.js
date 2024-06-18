@@ -57,6 +57,19 @@ module.exports = async (req, res) => {
                 }
             });
 
+            // genre 
+
+            let genreList = [];
+
+            detailMovieElements.forEach(element => {
+                const href = element.getAttribute('href');
+
+                if (href.includes('genre/')) {
+                    const text = element.textContent.trim();
+                    genreList.push({ name: text, url: href });
+                }
+            });
+
             // Mengambil Poster
             const posteroneElement = document.querySelector('div[id="player"]');
             const posterone = posteroneElement ? posteroneElement.getAttribute('data-poster') : 'N/A';
@@ -82,6 +95,7 @@ module.exports = async (req, res) => {
                 poster,
                 alurcerita,
                 aktor: aktorList,
+                genre: genreList,
                 player
             };
 
