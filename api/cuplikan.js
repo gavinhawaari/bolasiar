@@ -1,23 +1,7 @@
-const fetch = require('node-fetch');
-const timeago = require('timeago.js');
-
-// Register Indonesian locale for timeago
-timeago.register('id', (number, index, total_sec) => [
-    ['baru saja', 'sebentar'],
-    ['%s detik yang lalu', 'dalam %s detik'],
-    ['1 menit yang lalu', 'dalam 1 menit'],
-    ['%s menit yang lalu', 'dalam %s menit'],
-    ['1 jam yang lalu', 'dalam 1 jam'],
-    ['%s jam yang lalu', 'dalam %s jam'],
-    ['1 hari yang lalu', 'dalam 1 hari'],
-    ['%s hari yang lalu', 'dalam %s hari'],
-    ['1 minggu yang lalu', 'dalam 1 minggu'],
-    ['%s minggu yang lalu', 'dalam %s minggu'],
-    ['1 bulan yang lalu', 'dalam 1 bulan'],
-    ['%s bulan yang lalu', 'dalam %s bulan'],
-    ['1 tahun yang lalu', 'dalam 1 tahun'],
-    ['%s tahun yang lalu', 'dalam %s tahun']
-][index]);
+const https = require('https');
+const jsdom = require('jsdom');
+const { JSDOM } = jsdom;
+const targetUrl = require('./targeturl');
 
 module.exports = async (req, res) => {
     // Menambahkan header CORS ke dalam respons
@@ -31,35 +15,50 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Mengambil nilai parameter id dari permintaan
-    const id = req.query.id || 'default_id'; // Gantilah 'default_id' dengan ID default yang sesuai
+    
 
-    const url = `https://www.sofascore.com/api/v1/unique-tournament/${id}/media`;
+    const page = req.query.page !== undefined ? req.query.page : 1;
+    
+    let url = `https://tv.idlixofficial.net/movie/`;
+    
+    if (page !== 1) {
+        url += `page/${page}/`;
+    }
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
+    https.get(url, (response) => {
+        let data = '';
 
-        // Proses data
-        const formattedMedia = data.media.map(item => {
-            const timeAgo = timeago.format(new Date(item.createdAtTimestamp * 1000), 'id'); // Konversi timestamp ke milidetik
-            return {
-                title: item.title,
-                subtitle: item.subtitle,
-                url: item.url,
-                thumbnailUrl: item.thumbnailUrl,
-                mediaType: item.mediaType,
-                doFollow: item.doFollow,
-                keyHighlight: item.keyHighlight,
-                id: item.id,
-                createdAt: timeAgo,
-                sourceUrl: item.sourceUrl
-            };
+        // Mengumpulkan data yang diterima
+        response.on('data', (chunk) => {
+            data += chunk;
         });
 
-        res.json(formattedMedia);
-    } catch (error) {
-        console.error('Error fetching media:', error);
-        res.status(500).json({ error: 'Error fetching media' });
-    }
+        // Proses data setelah selesai diterima
+        response.on('end', () => {
+            const dom = new JSDOM(data);
+            const document = dom.window.document;
+
+            const articles = document.querySelectorAll('div[id="archive-content"] article');
+            let results = [];
+
+            articles.forEach(article => {
+                const poster = article.querySelector('div[class="poster"] img') ? article.querySelector('div[class="poster"] img').getAttribute('src') : 'N/A';
+                const title = article.querySelector('div[class="poster"] img') ? article.querySelector('div[class="poster"] img').getAttribute('alt') : 'N/A';
+                const slug = article.querySelector('div[class="poster"] a') ? article.querySelector('div[class="poster"] a').getAttribute('href') : 'N/A';
+                
+
+                
+                results.push({
+                    poster,
+                    title,
+                    slug    
+                });
+            });
+
+            res.status(200).json(results);
+        });
+
+    }).on('error', (err) => {
+        res.status(500).json({ error: err.message });
+    });
 };
