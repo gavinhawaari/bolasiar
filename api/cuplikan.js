@@ -25,19 +25,19 @@ module.exports = async (req, res) => {
       // Jika response tidak berhasil, lempar error
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-
+    
     // Mengubah response ke JSON
     const data = await response.json();
 
     // Memproses data JSON untuk mendapatkan bagian yang diperlukan
     const user = data.result.user;
     const result = {
-      nama_lengkap: user.full_name,
+      nama_lengkap: user.full_name || "Nama belum diisi", // Menyediakan nilai default jika full_name tidak ada
       akun_privat: user.is_private,
       bio: user.bio || "Tidak ada bio", // Menyediakan nilai default jika bio tidak ada
       jumlah_pengikut: user.follower_count || 0, // Menyediakan nilai default jika follower_count tidak ada
       jumlah_diikuti: user.following_count || 0, // Menyediakan nilai default jika following_count tidak ada
-      jumlah_media: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
+      jumlah_postingan: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
     };
 
     // Mengirimkan respon dalam format JSON
