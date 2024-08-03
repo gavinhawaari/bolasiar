@@ -1,7 +1,5 @@
 const https = require('https');
-const jsdom = require('jsdom');
-const { JSDOM } = jsdom;
-const targetUrl = require('./targeturl');
+const { JSDOM } = require('jsdom');
 
 module.exports = async (req, res) => {
     // Menambahkan header CORS ke dalam respons
@@ -15,50 +13,82 @@ module.exports = async (req, res) => {
         return;
     }
 
-    
-
-    const page = req.query.page !== undefined ? req.query.page : 1;
-    
-    let url = `https://tv.idlixofficial.net/movie/`;
-    
-    if (page !== 1) {
-        url += `page/${page}/`;
+    // Mengambil username dari query parameter
+    const username = req.query.username;
+    if (!username) {
+        res.status(400).json({ error: 'Username query parameter is required' });
+        return;
     }
 
-    https.get(url, (response) => {
-        let data = '';
+    const url = `https://www.picuki.com/profile/${username}`;
 
-        // Mengumpulkan data yang diterima
-        response.on('data', (chunk) => {
-            data += chunk;
-        });
+    try {
+        const profileData = await fetchProfileData(url);
+        const results = [profileData]; // Membungkus hasil dalam array
 
-        // Proses data setelah selesai diterima
-        response.on('end', () => {
-            const dom = new JSDOM(data);
-            const document = dom.window.document;
+        res.status(200).json(results);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching profile data', details: error.message });
+    }
+};
 
-            const articles = document.querySelectorAll('div[id="archive-content"] article');
-            let results = [];
+function fetchProfileData(url) {
+    return new Promise((resolve, reject) => {
+        https.get(url, (response) => {
+            let data = '';
 
-            articles.forEach(article => {
-                const poster = article.querySelector('div[class="poster"] img') ? article.querySelector('div[class="poster"] img').getAttribute('src') : 'N/A';
-                const title = article.querySelector('div[class="poster"] img') ? article.querySelector('div[class="poster"] img').getAttribute('alt') : 'N/A';
-                const slug = article.querySelector('div[class="poster"] a') ? article.querySelector('div[class="poster"] a').getAttribute('href') : 'N/A';
-                
-
-                
-                results.push({
-                    poster,
-                    title,
-                    slug    
-                });
+            // Mengumpulkan data yang diterima
+            response.on('data', (chunk) => {
+                data += chunk;
             });
 
-            res.status(200).json(results);
-        });
+            // Setelah seluruh data diterima
+            response.on('end', () => {
+                try {
+                    const dom = new JSDOM(data);
+                    const document = dom.window.document;
 
-    }).on('error', (err) => {
-        res.status(500).json({ error: err.message });
+                    const listMap = {};
+
+                    // Mengambil elemen private profile
+                    const privateProfile = document.querySelector('div.private-profile-top');
+
+                    if (privateProfile) {
+                        // Jika profil bersifat pribadi, jangan tampilkan data
+                        listMap["profile-status"] = "Profile is private.";
+                    } else {
+                        // Mengambil elemen profile name
+                        const profileNameTop = document.querySelector('h1.profile-name-top');
+                        const profileNameBottom = document.querySelector('h2.profile-name-bottom');
+
+                        listMap["profile-name-top"] = profileNameTop ? profileNameTop.textContent.trim() : "Nama belum diisi";
+                        listMap["profile-name-bottom"] = profileNameBottom ? profileNameBottom.textContent.trim() : "Nama belum diisi";
+
+                        // Mengambil elemen total posts
+                        const totalPosts = document.querySelector('span.total_posts');
+                        listMap["total_posts"] = totalPosts ? (totalPosts.textContent.trim() === "0" ? "0 Posts" : `${totalPosts.textContent.trim()} Posts`) : "0 Posts";
+
+                        // Mengambil elemen followers
+                        const followers = document.querySelector('span.followed_by');
+                        listMap["followers"] = followers ? (followers.textContent.trim() === "0" ? "0 Followers" : `${followers.textContent.trim()} Followers`) : "0 Followers";
+
+                        // Mengambil elemen following
+                        const following = document.querySelector('span.follows');
+                        listMap["following"] = following ? (following.textContent.trim() === "0" ? "0 Following" : `${following.textContent.trim()} Following`) : "0 Following";
+
+                        // Mengambil elemen profile description
+                        const profileDescription = document.querySelector('div.profile-description');
+                        listMap["profile-description"] = profileDescription ? profileDescription.textContent.trim() || "Belum menambahkan bio" : "Belum menambahkan bio";
+                    }
+
+                    resolve(listMap);
+                } catch (error) {
+                    reject(new Error('Error parsing HTML: ' + error.message));
+                }
+            });
+
+        }).on('error', (err) => {
+            reject(new Error('Error fetching profile data: ' + err.message));
+        });
     });
-};
+}
