@@ -20,8 +20,8 @@ module.exports = async (req, res) => {
         return;
     }
 
-    const page = req.query.page || 1;
-    const url = `https://www.picuki.com/profile/${username}/page/${page}`;
+    
+    const url = `https://www.picuki.com/profile/${username}`;
 
     try {
         const profileData = await fetchProfileData(url);
