@@ -1,5 +1,11 @@
 const fetch = require('node-fetch');
 
+// API key Gemini langsung di dalam kode
+const GEMINI_API_KEY = 'AIzaSyBigwlLUknqGBns_ciJuYjwnKlGGCdWNkY'; // Gantilah dengan API key Gemini Anda
+
+// URL API Gemini
+const GEMINI_API_URL = 'https://generativeai.googleapis.com/v1beta2/models/gemini-1.5-flash:generate'; // Gantilah dengan URL endpoint Gemini yang sesuai
+
 module.exports = async (req, res) => {
   // Menambahkan header CORS ke dalam respons
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,8 +48,35 @@ module.exports = async (req, res) => {
       jumlah_media: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
     };
 
+    // Membuat prompt untuk API Gemini
+    const prompt = `Berikan roasting singkat dengan kejam, menyindir, serta menyakitkan dalam bahasa gaul untuk profile github berikut: ${username}. Berikut detailnya: "${JSON.stringify(result)}"`;
+
+    // Menggunakan fetch untuk memanggil API Gemini
+    const generateContentResponse = await fetch(GEMINI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${GEMINI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        max_tokens: 100, // Sesuaikan dengan kebutuhan
+        temperature: 0.7, // Sesuaikan dengan kebutuhan
+      }),
+    });
+
+    if (!generateContentResponse.ok) {
+      throw new Error(`HTTP error! Status: ${generateContentResponse.status}`);
+    }
+
+    const geminiData = await generateContentResponse.json();
+    const geminiResponse = geminiData.choices[0].text.trim();
+
     // Mengirimkan respon dalam format JSON
-    res.status(200).json(result);
+    res.status(200).json({
+      userData: result,
+      roasting: geminiResponse
+    });
   } catch (error) {
     // Menangani error jika terjadi
     console.error('Terjadi kesalahan:', error);
