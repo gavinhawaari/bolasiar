@@ -23,14 +23,16 @@ module.exports = async (req, res) => {
     const url = `https://www.picuki.com/profile/${username}`;
 
     try {
-        const profileData = await fetchProfileData(url, username);
-        res.status(200).json(profileData);
+        const profileData = await fetchProfileData(url);
+        const results = [profileData]; // Membungkus hasil dalam array
+
+        res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching profile data', details: error.message });
     }
 };
 
-function fetchProfileData(url, username) {
+function fetchProfileData(url) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
             let data = '';
@@ -48,12 +50,12 @@ function fetchProfileData(url, username) {
 
                     const listMap = {};
 
-                    // Mengambil judul halaman
-                    const pageTitle = document.querySelector('title').textContent;
+                    // Mengambil elemen private profile
+                    const privateProfile = document.querySelector('div.private-profile-top');
 
-                    if (pageTitle.includes('Sorry but this profile is private')) {
-                        // Jika profil bersifat pribadi, tampilkan pesan dengan nama pengguna
-                        listMap["profile-status"] = `Maaf akun ${username} bersifat pribadi.`;
+                    if (privateProfile) {
+                        // Jika profil bersifat pribadi, jangan tampilkan data
+                        listMap["profile-status"] = "Profile is private.";
                     } else {
                         // Mengambil elemen profile name
                         const profileNameTop = document.querySelector('h1.profile-name-top');
