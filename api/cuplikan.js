@@ -1,10 +1,10 @@
 const fetch = require('node-fetch');
 
 // API key Gemini langsung di dalam kode
-const GEMINI_API_KEY = 'AIzaSyBigwlLUknqGBns_ciJuYjwnKlGGCdWNkY'; // Gantilah dengan API key Gemini Anda
+const GEMINI_API_KEY = 'AIzaSyBigwlLUknqGBns_ciJuYjwnKlGGCdWNkY'; // API key Gemini Anda
 
 // URL API Gemini
-const GEMINI_API_URL = 'https://generativeai.googleapis.com/v1beta2/models/gemini-1.5-flash:generate'; // Gantilah dengan URL endpoint Gemini yang sesuai
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`; // URL endpoint Gemini
 
 module.exports = async (req, res) => {
   // Menambahkan header CORS ke dalam respons
@@ -55,13 +55,16 @@ module.exports = async (req, res) => {
     const generateContentResponse = await fetch(GEMINI_API_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${GEMINI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        prompt: prompt,
-        max_tokens: 100, // Sesuaikan dengan kebutuhan
-        temperature: 0.7, // Sesuaikan dengan kebutuhan
+        contents: [
+          {
+            parts: [
+              { text: prompt }
+            ]
+          }
+        ]
       }),
     });
 
@@ -70,7 +73,7 @@ module.exports = async (req, res) => {
     }
 
     const geminiData = await generateContentResponse.json();
-    const geminiResponse = geminiData.choices[0].text.trim();
+    const geminiResponse = geminiData.contents[0].parts[0].text.trim();
 
     // Mengirimkan respon dalam format JSON
     res.status(200).json({
