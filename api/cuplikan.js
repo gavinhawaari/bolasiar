@@ -20,19 +20,18 @@ module.exports = async (req, res) => {
         return;
     }
 
+  
     const url = `https://www.picuki.com/profile/${username}`;
 
     try {
-        const profileData = await fetchProfileData(url);
-        const results = [profileData]; // Membungkus hasil dalam array
-
-        res.status(200).json(results);
+        const profileData = await fetchProfileData(url, username);
+        res.status(200).json(profileData);
     } catch (error) {
         res.status(500).json({ error: 'Error fetching profile data', details: error.message });
     }
 };
 
-function fetchProfileData(url) {
+function fetchProfileData(url, username) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
             let data = '';
@@ -48,14 +47,21 @@ function fetchProfileData(url) {
                     const dom = new JSDOM(data);
                     const document = dom.window.document;
 
-                    const listMap = {};
+                    const listMap = {
+                        "profile-name-top": "Nama belum diisi",
+                        "profile-name-bottom": "Nama belum diisi",
+                        "total_posts": "0 Posts",
+                        "followers": "0 Followers",
+                        "following": "0 Following",
+                        "profile-description": "Belum menambahkan bio"
+                    };
 
                     // Mengambil elemen private profile
                     const privateProfile = document.querySelector('div.private-profile-top');
 
                     if (privateProfile) {
-                        // Jika profil bersifat pribadi, jangan tampilkan data
-                        listMap["profile-status"] = "Profile is private.";
+                        // Jika profil bersifat pribadi, tampilkan pesan
+                        listMap["profile-status"] = `Maaf akun ${username} bersifat pribadi`;
                     } else {
                         // Mengambil elemen profile name
                         const profileNameTop = document.querySelector('h1.profile-name-top');
