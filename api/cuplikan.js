@@ -20,11 +20,9 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Menyusun URL untuk profil berdasarkan username
     const url = `https://www.picuki.com/profile/${username}`;
 
     try {
-        // Mendapatkan data profil dari URL
         const profileData = await fetchProfileData(url, username);
         res.status(200).json(profileData);
     } catch (error) {
@@ -32,7 +30,6 @@ module.exports = async (req, res) => {
     }
 };
 
-// Fungsi untuk mengambil dan memproses data profil
 function fetchProfileData(url, username) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
@@ -49,21 +46,14 @@ function fetchProfileData(url, username) {
                     const dom = new JSDOM(data);
                     const document = dom.window.document;
 
-                    const listMap = {
-                        "profile-name-top": "Nama belum diisi",
-                        "profile-name-bottom": "Nama belum diisi",
-                        "total_posts": "0 Posts",
-                        "followers": "0 Followers",
-                        "following": "0 Following",
-                        "profile-description": "Belum menambahkan bio"
-                    };
+                    const listMap = {};
 
-                    // Mengambil elemen private profile
-                    const privateProfile = document.querySelector('div.private-profile-top');
+                    // Mengambil judul halaman
+                    const pageTitle = document.querySelector('title').textContent;
 
-                    if (privateProfile) {
-                        // Jika profil bersifat pribadi, tampilkan pesan dan jangan menampilkan data lainnya
-                        listMap["profile-status"] = `Maaf akun ${username} bersifat pribadi`;
+                    if (pageTitle.includes('Sorry but this profile is private')) {
+                        // Jika profil bersifat pribadi, tampilkan pesan dengan nama pengguna
+                        listMap["profile-status"] = `Maaf akun ${username} bersifat pribadi.`;
                     } else {
                         // Mengambil elemen profile name
                         const profileNameTop = document.querySelector('h1.profile-name-top');
