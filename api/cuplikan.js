@@ -64,7 +64,8 @@ module.exports = (req, res) => {
                     listMap["profile-description"] = profileDescription ? profileDescription.textContent.trim() || "Belum menambahkan bio" : "Belum menambahkan bio";
                 }
 
-                res.status(200).json(listMap);
+                // Mengembalikan hasil dalam array
+                res.status(200).json([listMap]);
             } catch (error) {
                 res.status(500).json({ error: 'Error parsing HTML: ' + error.message });
             }
