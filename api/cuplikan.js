@@ -20,10 +20,11 @@ module.exports = async (req, res) => {
         return;
     }
 
-  
+    // Menyusun URL untuk profil berdasarkan username
     const url = `https://www.picuki.com/profile/${username}`;
 
     try {
+        // Mendapatkan data profil dari URL
         const profileData = await fetchProfileData(url, username);
         res.status(200).json(profileData);
     } catch (error) {
@@ -31,6 +32,7 @@ module.exports = async (req, res) => {
     }
 };
 
+// Fungsi untuk mengambil dan memproses data profil
 function fetchProfileData(url, username) {
     return new Promise((resolve, reject) => {
         https.get(url, (response) => {
@@ -60,7 +62,7 @@ function fetchProfileData(url, username) {
                     const privateProfile = document.querySelector('div.private-profile-top');
 
                     if (privateProfile) {
-                        // Jika profil bersifat pribadi, tampilkan pesan
+                        // Jika profil bersifat pribadi, tampilkan pesan dan jangan menampilkan data lainnya
                         listMap["profile-status"] = `Maaf akun ${username} bersifat pribadi`;
                     } else {
                         // Mengambil elemen profile name
