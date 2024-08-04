@@ -1,5 +1,16 @@
 const fetch = require('node-fetch');
 
+const DUCKDUCKGO_API_URL = 'https://duckduckgo.com/duckchat/v1/chat';
+const DUCKDUCKGO_HEADERS = {
+  'x-vqd-4': '4-216627997908647439520026804833003885766',
+  'accept': 'text/event-stream',
+  'cookie': 'dcm=3',
+  'priority': 'u=1, i',
+  'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Android WebView";v="126"',
+  'Content-Type': 'application/json',
+  'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Redmi Note 7 Build/QKQ1.190910.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.188 Mobile Safari/537.36'
+};
+
 module.exports = async (req, res) => {
   // Menambahkan header CORS ke dalam respons
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,8 +53,33 @@ module.exports = async (req, res) => {
       jumlah_media: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
     };
 
+    // Membuat prompt untuk API DuckDuckGo Chat
+    const prompt = `berikan roasting singkat dengan kejam, lucu, bikin dia marah, menyindir, serta menyakitkan dalam bahasa gaul untuk profile instagram berikut: nama pengguna: ${username}. Berikut detailnya: ${JSON.stringify(result)}`;
+
+    // Menggunakan fetch untuk memanggil API DuckDuckGo Chat
+    const chatResponse = await fetch(DUCKDUCKGO_API_URL, {
+      method: 'POST',
+      headers: DUCKDUCKGO_HEADERS,
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "user", content: prompt }
+        ]
+      })
+    });
+
+    if (!chatResponse.ok) {
+      throw new Error(`HTTP error! Status: ${chatResponse.status}`);
+    }
+
+    const chatData = await chatResponse.json();
+    const chatContent = chatData.messages[0].content.trim();
+
     // Mengirimkan respon dalam format JSON
-    res.status(200).json(result);
+    res.status(200).json({
+      userData: result,
+      roasting: chatContent
+    });
   } catch (error) {
     // Menangani error jika terjadi
     console.error('Terjadi kesalahan:', error);
