@@ -22,7 +22,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const prompt = req.query.isichat || 'hi';
+    const prompt = req.query.promt || 'hi';
     const response = await fetch(DUCKDUCKGO_API_URL, {
       method: 'POST',
       headers: DUCKDUCKGO_HEADERS,
