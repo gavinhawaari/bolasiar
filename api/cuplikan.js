@@ -1,11 +1,5 @@
 const fetch = require('node-fetch');
 
-// API key ChatGPT langsung di dalam kode
-const OPENAI_API_KEY = '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'; // API key ChatGPT Anda
-
-// URL API ChatGPT
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions'; // URL endpoint ChatGPT
-
 module.exports = async (req, res) => {
   // Menambahkan header CORS ke dalam respons
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -48,38 +42,8 @@ module.exports = async (req, res) => {
       jumlah_media: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
     };
 
-    // Membuat prompt untuk API ChatGPT
-    const prompt = `Berikan roasting singkat dengan kejam, menyindir, serta menyakitkan dalam bahasa gaul untuk profile github berikut: ${username}. Berikut detailnya: ${JSON.stringify(result)}`;
-
-    // Menggunakan fetch untuk memanggil API ChatGPT
-    const generateContentResponse = await fetch(OPENAI_API_URL, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo", // Gantilah dengan model yang sesuai jika diperlukan
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 150, // Sesuaikan dengan kebutuhan
-        temperature: 0.7 // Sesuaikan dengan kebutuhan
-      }),
-    });
-
-    if (!generateContentResponse.ok) {
-      throw new Error(`HTTP error! Status: ${generateContentResponse.status}`);
-    }
-
-    const chatGPTData = await generateContentResponse.json();
-    const chatGPTResponse = chatGPTData.choices[0].message.content.trim();
-
     // Mengirimkan respon dalam format JSON
-    res.status(200).json({
-      userData: result,
-      roasting: chatGPTResponse
-    });
+    res.status(200).json(result);
   } catch (error) {
     // Menangani error jika terjadi
     console.error('Terjadi kesalahan:', error);
