@@ -3,10 +3,6 @@ const fetch = require('node-fetch');
 const DUCKDUCKGO_API_URL = 'https://duckduckgo.com/duckchat/v1/chat';
 const DUCKDUCKGO_HEADERS = {
   'x-vqd-4': '4-216627997908647439520026804833003885766',
-  'accept': 'text/event-stream',
-  'cookie': 'dcm=3',
-  'priority': 'u=1, i',
-  'sec-ch-ua': '"Not/A)Brand";v="8", "Chromium";v="126", "Android WebView";v="126"',
   'Content-Type': 'application/json',
   'User-Agent': 'Mozilla/5.0 (Linux; Android 10; Redmi Note 7 Build/QKQ1.190910.002) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.6478.188 Mobile Safari/537.36'
 };
