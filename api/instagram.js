@@ -39,7 +39,7 @@ module.exports = async (req, res) => {
       biography: user.biography || "Akun ini tidak memiliki biography", // Menyediakan nilai default jika bio tidak ada
       jumlah_pengikut: user.follower_count || 0, // Menyediakan nilai default jika follower_count tidak ada
       jumlah_diikuti: user.following_count || 0, // Menyediakan nilai default jika following_count tidak ada
-      jumlah_postingan: user.media_count || 0 // Menyediakan nilai default jika media_count tidak ada
+      jumlah_postingan: user.media_count || 0, // Menyediakan nilai default jika media_count tidak ada
       foto_profil: user.hd_profile_pic_url_info?.url || "Foto profil tidak tersedia" // Menyediakan nilai default jika hd_profile_pic_url_info tidak ada
     };
 
@@ -48,6 +48,6 @@ module.exports = async (req, res) => {
   } catch (error) {
     // Menangani error jika terjadi
     console.error('Terjadi kesalahan:', error);
-    res.status(500).json({ error: 'Terjadi kesalahan saat mengambil data.' });
+    res.status(500).json({ error: 'Akun instagram atas nama pengguna ${username} tidak ditemukan.' });
   }
 };
