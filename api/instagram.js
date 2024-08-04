@@ -40,7 +40,9 @@ module.exports = async (req, res) => {
       jumlah_pengikut: user.follower_count || 0, // Menyediakan nilai default jika follower_count tidak ada
       jumlah_diikuti: user.following_count || 0, // Menyediakan nilai default jika following_count tidak ada
       jumlah_postingan: user.media_count || 0, // Menyediakan nilai default jika media_count tidak ada
-      foto_profil: user.hd_profile_pic_url_info?.url || "Foto profil tidak tersedia" // Menyediakan nilai default jika hd_profile_pic_url_info tidak ada
+      foto_profil: user.hd_profile_pic_url_info
+        ? `https://media.gramsnap.com/get?uri=${encodeURIComponent(user.hd_profile_pic_url_info.url)}&__sig=${user.hd_profile_pic_url_info.url_signature.signature}&__expires=${user.hd_profile_pic_url_info.url_signature.expires}`
+        : "Foto profil tidak tersedia"
     };
 
     // Mengirimkan respon dalam format JSON
