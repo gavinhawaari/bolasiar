@@ -22,7 +22,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const prompt = req.query.prompt || 'hi';
+    // Mengambil parameter 'isichat' dari query string
+    const prompt = req.query.isichat || 'hi';
+    
     const response = await fetch(DUCKDUCKGO_API_URL, {
       method: 'POST',
       headers: DUCKDUCKGO_HEADERS,
@@ -34,6 +36,7 @@ module.exports = async (req, res) => {
       })
     });
 
+    // Mendapatkan hasil sebagai teks
     const result = await response.text();
     res.status(200).send(result);
   } catch (error) {
