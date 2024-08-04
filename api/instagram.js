@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
     const user = data.result.user;
     const result = {
       nama_lengkap: user.full_name || "Nama belum diisi", // Menyediakan nilai default jika full_name tidak ada
+      username: user.username || "User tidak ada",
       status_akun: user.is_private
         ? `Akun atas nama ${username} ini di private rahasia`
         : `Akun atas nama ${username} ini publik`, // Menyediakan nilai deskriptif berdasarkan is_private
