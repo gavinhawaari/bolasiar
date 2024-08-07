@@ -17,19 +17,43 @@ function getRandomizedClientId(clientId) {
 
 const API_URL = 'https://chatgptfree.onl/wp-admin/admin-ajax.php';
 const TARGET_URL = 'https://chatgptfree.onl/';
+const VALID_TOKEN = 'akhirpetang-9262826287262626262'; // Token autentikasi yang valid
 
 module.exports = async (req, res) => {
+  // Menambahkan header CORS ke dalam respons
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
+  // Mengatasi preflight request (OPTIONS)
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
+  // Memeriksa header Authorization
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) {
+    res.status(401).json({ error: 'No authorization header provided' });
+    return;
+  }
+
+  const token = authHeader.split(' ')[1]; // Mengambil token dari header
+  if (token !== VALID_TOKEN) {
+    res.status(403).json({ error: 'Invalid token' });
+    return;
+  }
+
   try {
-    const prompt = req.query.isi || 'hi';
+    const userPrompt = req.query.isi;
+
+    // Validasi bahwa query 'isi' harus ada
+    if (!userPrompt) {
+      res.status(400).send({ error: 'Tidak ada perintah' });
+      return;
+    }
+
+    const fullPrompt = `Berikan roasting singkat dengan kejam, menyindir, lucu, serta menyakitkan dalam bahasa gaul untuk profile Instagram berikut: ${userPrompt}`;
 
     // Ambil data nonce dari halaman target
     const nonce = await new Promise((resolve, reject) => {
@@ -61,7 +85,7 @@ module.exports = async (req, res) => {
     form.append('post_id', '221');
     form.append('url', 'https://chatgptfree.onl');
     form.append('action', 'wpaicg_chat_shortcode_message');
-    form.append('message', prompt);
+    form.append('message', fullPrompt);
     form.append('bot_id', '0');
     form.append('chatbot_identity', 'shortcode');
     
